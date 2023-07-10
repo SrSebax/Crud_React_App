@@ -27,6 +27,7 @@ class App extends React.Component {
       videojuego: "",
     },
     modalInsertar: false,
+    modalEditar: false,
   };
 
   handleChange = (e) => {
@@ -41,6 +42,7 @@ class App extends React.Component {
   mostrarModalInsertar = () => {
     this.setState({ modalInsertar: true });
   };
+
   ocultarModalInsertar = () => {
     this.setState({ modalInsertar: false });
   };
@@ -48,53 +50,46 @@ class App extends React.Component {
   mostrarModalEditar = (registro) => {
     this.setState({ modalEditar: true, form: registro });
   };
+
   ocultarModalEditar = () => {
     this.setState({ modalEditar: false });
   };
 
   insertar = () => {
-    var valorNuevo = { ...this.state.form };
-    valorNuevo.id = this.state.data.length + 1;
-    var lista = this.state.data;
-    lista.push(valorNuevo);
+    const valorNuevo = {
+      ...this.state.form,
+      id: this.state.data.length + 1,
+    };
+    const lista = [...this.state.data, valorNuevo];
     this.setState({ data: lista, modalInsertar: false });
   };
 
   editar = (dato) => {
-    var contador = 0;
-    var lista = this.state.data;
-    lista.map((registro) => {
-      if (dato.id == registro.id) {
-        lista[contador].personaje = dato.personaje;
-        lista[contador].videojuego = dato.videojuego;
-      }
-      contador++;
-    });
-    this.setState({ data: lista, modalEditar: false });
+    const index = this.state.data.findIndex((elemento) => elemento.id === dato.id);
+    if (index !== -1) {
+      const lista = [...this.state.data];
+      lista[index] = Object.assign({}, dato);
+      this.setState({ data: lista, modalEditar: false });
+    }
   };
 
   eliminar = (dato) => {
-    var opcion = window.confirm(
+    const opcion = window.confirm(
       "Realmente desea eliminar el personaje: " + dato.personaje
     );
     if (opcion) {
-      var contador = 0;
-      var lista = this.state.data;
-      lista.map((registro) => {
-        if (registro.id == dato.id) {
-          lista.splice(contador, 1);
-        }
-        contador++;
-      });
+      const lista = this.state.data.filter((elemento) => elemento.id !== dato.id);
       this.setState({ data: lista });
     }
   };
 
   render() {
+    const { form, data, modalInsertar, modalEditar } = this.state;
+
     return (
       <div>
         <Container>
-          <Button color="success" onClick={() => this.mostrarModalInsertar()}>
+          <Button color="success" onClick={this.mostrarModalInsertar}>
             Insertar Nuevo Personaje
           </Button>
 
@@ -109,8 +104,8 @@ class App extends React.Component {
             </thead>
 
             <tbody>
-              {this.state.data.map((elemento) => (
-                <tr>
+              {data.map((elemento) => (
+                <tr key={elemento.id}>
                   <td>{elemento.id}</td>
                   <td>{elemento.personaje}</td>
                   <td>{elemento.videojuego}</td>
@@ -120,8 +115,7 @@ class App extends React.Component {
                       onClick={() => this.mostrarModalEditar(elemento)}
                     >
                       Editar
-                    </Button>
-                    {"  "}
+                    </Button>{" "}
                     <Button
                       color="outline-danger"
                       onClick={() => this.eliminar(elemento)}
@@ -136,7 +130,7 @@ class App extends React.Component {
         </Container>
 
         {/* AGREGAR */}
-        <Modal isOpen={this.state.modalInsertar}>
+        <Modal isOpen={modalInsertar}>
           <ModalHeader>
             <div>
               <h3>Insertar Personaje</h3>
@@ -150,8 +144,8 @@ class App extends React.Component {
                 className="form-control"
                 readOnly
                 type="text"
-                value={this.state.data.length + 1}
-              ></input>
+                value={data.length + 1}
+              />
             </FormGroup>
 
             <FormGroup>
@@ -161,7 +155,7 @@ class App extends React.Component {
                 name="personaje"
                 type="text"
                 onChange={this.handleChange}
-              ></input>
+              />
             </FormGroup>
 
             <FormGroup>
@@ -171,22 +165,22 @@ class App extends React.Component {
                 name="videojuego"
                 type="text"
                 onChange={this.handleChange}
-              ></input>
+              />
             </FormGroup>
           </ModalBody>
 
           <ModalFooter>
-            <Button color="primary" onClick={() => this.insertar()}>
+            <Button color="primary" onClick={this.insertar}>
               Insertar
-            </Button>
-            <Button color="danger" onClick={() => this.ocultarModalInsertar()}>
+            </Button>{" "}
+            <Button color="danger" onClick={this.ocultarModalInsertar}>
               Cancelar
             </Button>
           </ModalFooter>
         </Modal>
 
         {/* EDITAR */}
-        <Modal isOpen={this.state.modalEditar}>
+        <Modal isOpen={modalEditar}>
           <ModalHeader>
             <div>
               <h3>Editar Personaje</h3>
@@ -200,8 +194,8 @@ class App extends React.Component {
                 className="form-control"
                 readOnly
                 type="text"
-                value={this.state.form.id}
-              ></input>
+                value={form.id}
+              />
             </FormGroup>
 
             <FormGroup>
@@ -211,8 +205,8 @@ class App extends React.Component {
                 name="personaje"
                 type="text"
                 onChange={this.handleChange}
-                value={this.state.form.personaje}
-              ></input>
+                value={form.personaje}
+              />
             </FormGroup>
 
             <FormGroup>
@@ -222,19 +216,16 @@ class App extends React.Component {
                 name="videojuego"
                 type="text"
                 onChange={this.handleChange}
-                value={this.state.form.videojuego}
-              ></input>
+                value={form.videojuego}
+              />
             </FormGroup>
           </ModalBody>
 
           <ModalFooter>
-            <Button
-              color="primary"
-              onClick={() => this.editar(this.state.form)}
-            >
+            <Button color="primary" onClick={() => this.editar(form)}>
               Editar
-            </Button>
-            <Button color="danger" onClick={() => this.ocultarModalEditar()}>
+            </Button>{" "}
+            <Button color="danger" onClick={this.ocultarModalEditar}>
               Cancelar
             </Button>
           </ModalFooter>
