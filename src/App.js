@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Table,
   Button,
@@ -11,6 +12,14 @@ import {
   ModalFooter,
   ModalHeader,
 } from "reactstrap";
+
+import image from "./personajes.png";
+import {
+  faPenToSquare,
+  faStar,
+  faTrash,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 
 const data = [
   { id: 1, personaje: "Jefe Maestro", videojuego: "Halo" },
@@ -65,7 +74,9 @@ class App extends React.Component {
   };
 
   editar = (dato) => {
-    const index = this.state.data.findIndex((elemento) => elemento.id === dato.id);
+    const index = this.state.data.findIndex(
+      (elemento) => elemento.id === dato.id
+    );
     if (index !== -1) {
       const lista = [...this.state.data];
       lista[index] = Object.assign({}, dato);
@@ -78,7 +89,9 @@ class App extends React.Component {
       "Realmente desea eliminar el personaje: " + dato.personaje
     );
     if (opcion) {
-      const lista = this.state.data.filter((elemento) => elemento.id !== dato.id);
+      const lista = this.state.data.filter(
+        (elemento) => elemento.id !== dato.id
+      );
       this.setState({ data: lista });
     }
   };
@@ -89,17 +102,27 @@ class App extends React.Component {
     return (
       <div>
         <Container>
-          <Button color="success" onClick={this.mostrarModalInsertar}>
-            Insertar Nuevo Personaje
-          </Button>
+          <div className="image-section">
+            <img src={image} alt="image" className="image" />
+            <Button color="success" onClick={this.mostrarModalInsertar}>
+              <FontAwesomeIcon icon={faStar} className="star-icon" />
+              Insertar Nuevo Personaje
+              <FontAwesomeIcon icon={faStar} className="star-icon" />
+            </Button>
+          </div>
 
-          <Table>
+          <Table className="table">
             <thead>
               <tr>
                 <th>Id</th>
                 <th>Personaje</th>
                 <th>Videojuego</th>
-                <th>Acciones</th>
+                <th>
+                  <FontAwesomeIcon icon={faPenToSquare} />
+                </th>
+                <th>
+                  <FontAwesomeIcon icon={faTrashCan} />
+                </th>
               </tr>
             </thead>
 
@@ -111,13 +134,15 @@ class App extends React.Component {
                   <td>{elemento.videojuego}</td>
                   <td>
                     <Button
-                      color="outline-primary"
+                      color="primary"
                       onClick={() => this.mostrarModalEditar(elemento)}
                     >
                       Editar
-                    </Button>{" "}
+                    </Button>
+                  </td>
+                  <td>
                     <Button
-                      color="outline-danger"
+                      color="danger"
                       onClick={() => this.eliminar(elemento)}
                     >
                       Eliminar
